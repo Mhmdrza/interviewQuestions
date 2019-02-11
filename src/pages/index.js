@@ -19,7 +19,6 @@ class IndexPage extends React.Component {
   
   findVolume = (left, right) =>{
     console.log('l:', left , ' → ' ,'r:', right);
-    let max = arrayMax(heights.slice(left,right-left))
     let peak = smallerHeight(right,left)
     for(let i = left+1; i<right; i++){
       if(heightOf(i)>peak){
@@ -29,7 +28,7 @@ class IndexPage extends React.Component {
           volumes[c]= peak - heights[c]
           c++
         }
-        this.findVolume(i,max)
+        this.findVolume(i,right)
         i++
         break;
       }else{
@@ -49,7 +48,6 @@ class IndexPage extends React.Component {
         <div className='geo-parent'>
           {
             this.state.terrainData.map( (terrain,index) => {
-              
               return (
                 <div key={Math.floor(Math.random() * Math.floor(999999999))} className="single-terrain_parent">
                   {heights.slice(0,volumes[index]).map( t=>
@@ -73,9 +71,5 @@ function heightOf (i) {
 function smallerHeight (a,b) {
   return heightOf(a)<heightOf(b) ? heightOf(a): heightOf(b)
 }
-function arrayMax(arr) {
-  return arr.reduce(function (p, v, i) {
-    return ( p > v ? i : i-1 );
-  });
-}
+
 export default IndexPage
