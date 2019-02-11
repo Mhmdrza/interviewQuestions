@@ -3,38 +3,40 @@ import { Link } from "gatsby"
 
 import Layout from "../containers/layout"
 import SEO from "../containers/seo"
-import Image from "../components/image"
-
-const heights = [1,3,2,4,1,3,1,4,5,2,2,1,4,2,2]
-const volumes = heights.slice(0,heights.length-1)
 
 class IndexPage extends React.Component {
   constructor(props) {
     super(props)
-  
     this.state = {
-      terrainData: heights
+      terrainData: [1,3,2,4,1,3,1,4,5,2,2,1,4,2],
+      volumes: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0].slice(0,15)
     }
   }
   
   findVolume = (left, right) =>{
-    console.log('l:', left , ' → ' ,'r:', right);
-    let peak = smallerHeight(right,left)
-    for(let i = left+1; i<right; i++){
-      if(heightOf(i)>peak){
-        peak = smallerHeight(i,left)
-        let c=left
-        while(c<=i){
-          volumes[c]= peak - heights[c]
-          c++
-        }
-        this.findVolume(i,right)
-        i++
-        break;
-      }else{
-        volumes[i]= peak - heights[i]
+    let slicedArray = this.state.terrainData.slice(left+1,right)
+    let maximum = arrayMax(slicedArray)
+    let peak = this.smallerHeight(right,left)
+    console.log('l:', left , '→' ,'r:', right, ' and ', right-left, ' elements');
+    if( slicedArray[maximum]>this.heightOf(left) || slicedArray[maximum]>this.heightOf(right)){
+      this.findVolume(maximum+left+1,right)
+      this.findVolume(left,maximum+left+1)
+    }else{
+      let c = left
+      while (c<=right) {
+        let result = this.heightOf(peak) - this.state.terrainData[c]
+        this.state.volumes[c] = result>0 ? result : 0
+        c++
       }
     }
+  }
+
+  heightOf = (i) =>{
+    return this.state.terrainData[i]
+  }
+
+  smallerHeight = (a,b)=> {
+    return this.heightOf(a)<this.heightOf(b) ? a: b
   }
 
   render(){
@@ -42,18 +44,22 @@ class IndexPage extends React.Component {
       <Layout>
         <SEO title="Home" keywords={[`gatsby`, `application`, `react`]} />
         <h1>Challenge 3</h1>
-        <button onClick={()=>this.forceUpdate()}>update</button>
         <p>finding volume of water in the given array </p>
-        <p>{this.findVolume(0,heights.length-1)}</p>
+        <input onChange={(e)=>this.setState({terrainData:e.target.value.split(',')})} value={this.state.terrainData}/>
+        <button onClick={()=>{
+            this.findVolume(0,this.state.terrainData.length-1)
+            this.forceUpdate()
+          }
+        }>update</button>
         <div className='geo-parent'>
           {
             this.state.terrainData.map( (terrain,index) => {
               return (
                 <div key={Math.floor(Math.random() * Math.floor(999999999))} className="single-terrain_parent">
-                  {heights.slice(0,volumes[index]).map( t=>
+                  {this.state.terrainData.slice(0,this.state.volumes[index]).map( t=>
                     <span key={Math.floor(Math.random() * Math.floor(999999999))} className='terrain-bit --blue'/>
                   )}
-                  {heights.slice(0,terrain).map( t=>
+                  {this.state.terrainData.slice(0,terrain).map( t=>
                     <span key={Math.floor(Math.random() * Math.floor(888888888889))} className='terrain-bit'/>
                   )}
                 </div>
@@ -61,15 +67,21 @@ class IndexPage extends React.Component {
             })
           }
         </div>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
       </Layout>
       )
     }
 }
-function heightOf (i) {
-  return heights[i]
-}
-function smallerHeight (a,b) {
-  return heightOf(a)<heightOf(b) ? heightOf(a): heightOf(b)
-}
 
+function arrayMax(arr) {
+  return arr.reduce((iMax, x, i, arr) => x > arr[iMax] ? i : iMax, 0);
+}
 export default IndexPage
